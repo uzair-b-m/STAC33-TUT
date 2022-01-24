@@ -1,0 +1,168 @@
+---
+title: "Live TUT-2"
+author: "Uzair"
+date: "1/24/2022"
+output: html_document
+---
+
+# Introduction
+
+
+The chapters can be found here: [https://ritsokiguess.site/pasias/drawing-graphs.html] \
+Notes to follow along are here: [https://github.com/ujji7/STAC33-TUT] \
+
+
+## CH:3.6 Juice problem
+First load the library tidyverse
+```{r, load_libraries, include=FALSE, results='hide'}
+library(tidyverse)
+```
+
+
+### Load data + look at some of the values
+url <- "http://ritsokiguess.site/datafiles/ojuice.txt"
+```{r}
+
+```
+
+
+
+### Goal: find a relation between the 2 variables
+```{r}
+
+```
+
+
+
+### Summary
+
+
+## 3.7 Making soap
+```{r, warning=FALSE}
+url <- "http://ritsokiguess.site/datafiles/soap.txt"
+soap <- read_delim(url, " ")
+```
+
+Lets look at some of the data now along with some properties of our data
+`head()` -> 
+`summary()` ->
+```{r, warning = F}
+
+```
+
+
+### Make a histogram for SCRAP
+To make histogram we use `geom_histogram()` with an appropriate binsize \
+```{r}
+
+```
+
+
+
+3) Features of the graph
+  **modes**
+  **Range** 
+  **Skewness?** 
+
+## Make a side-by-side box-plot
+`geom_boxplot()` is used to make the box-plot
+```{r}
+
+```
+
+
+
+
+
+3) Features of the graph
+  **Range** between the 2 plants \
+  **Median**, \
+  **outlier** \
+  **MEAN** 
+  
+  
+  
+  
+  
+### Summary
+
+## 4.11
+
+### Reading the data and observing some of the data
+```{r}
+my_url <- "https://raw.githubusercontent.com/nxskok/datafiles/master/compatt.txt"
+anxiety <- read_delim(my_url," ")
+
+head(anxiety)
+```
+
+### Number of males and females in our sample
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+`group_by()` 
+`summarise()` ->  `n()` 
+
+### Mean and SD of CAS and CARS not seperated by gender
+```{r}
+
+```
+
+
+
+Doing it without mentioning the column name
+```{r}
+
+```
+
+
+`mean()`, `sd()` -> 
+`select()` -> 
+`across()` -> 
+`list()` ->
+
+Same thing for all the quantitative variables
+```{r}
+
+```
+
+
+
+`where()` -> 
+`is.numeric`-> 
+
+Again to see and compare the relation between the 2 variables in each group
+```{r}
+
+```
+
+
+`color()` -> 
+
+
+### Add and store the sum of CARS and CAS and compare the average of this SUM now between Male and Female
+```{r, warning=F}
+```
+
+
+`mutate()` -> 
+
+### Summary
+`group_by()` -> 
+`summarise()` -> 
+`where()` -> 
