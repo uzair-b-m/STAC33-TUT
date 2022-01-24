@@ -109,9 +109,9 @@ ggplot(soap, aes(x = line , y = scrap)) + geom_boxplot()
   Never make inference about **MEAN** when discussing box-plot NOT reliable \
   
 ### Summary
-Histogram for distribution and spread and mode \
+Histogram for distribution and spread mean, and mode \
 bins are for dividing the range of x-values \
-Box-plot for range if values + Q1 Q3 median + outliers \
+Box-plot for range of values + Q1 Q3 median + outliers \
   
 
 ## 4.11
