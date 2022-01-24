@@ -1,0 +1,182 @@
+---
+title: "STAC33 TUT-2"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Introduction
+We will be discussing problems from ch:3 and ch:4 from the PASIAS(Problems and Solutions in Applied Statistics). Ch:3 focuses on drawing graphs and ch:4 is about exploring data. So hopefully by the end of this session we are familiar with what graphs to draw given a problem and also perform introductory data analysis given a dataset.
+
+The chapters can be found here: [https://ritsokiguess.site/pasias/drawing-graphs.html]
+
+## CH:3.6 Juice problem
+First load the library tidyverse
+```{r, load_libraries, include=FALSE, results='hide'}
+library(tidyverse)
+```
+
+
+### Load data
+1) Specify the URL (optional BUT recomended) \
+2) load data
+  2.1) `read_delim()` -> used to load data separated by a certain character which needs to be specefied
+
+
+```{r}
+url <- "http://ritsokiguess.site/datafiles/ojuice.txt"
+juice <- read_delim(url, " ")
+```
+Lets look at some of data
+`glimpse()` -> shows the values along with characteristics
+`head()` -> shows first few values
+```{r}
+glimpse(juice)
+head(juice)
+```
+ - Variables are -> **run, sweetness, pectin**
+
+### Goal: find a relation between the 2 variables
+1) Note the TYPE of the variable involved. (Quantitative, sweetness appears to be continuous)
+2) Choose Scatter plot to observe a trend
+
+3) Then Draw a line between the plot to see the relation
+
+`ggpplot()` -> plotting package in tidyverse that provides helpful commands to create plots
+Think of this as a masterchef you call for a day who will be helping you make your meal, this chef will setup the place and the setting for you but you have to make the choice of using a knife vs a peeler depending on the task
+```{r}
+# just the scatter plot
+ggplot(juice, aes(x = pectin, y = sweetness)) + geom_point()
+
+# with the line of best-fit
+ggplot(juice, aes(x = pectin, y = sweetness)) + geom_point() + geom_smooth(method = lm, se= F)
+## method = lm for best fit
+## se = F removes the confidence bands around the line
+```
+- General downwards trend with the increase in pectin
+- But not really convincing as there appears to be 2 extreme values above 350 BUT they are also follow the same trend
+
+### Summary
+- When asked to come up with the relationship between 2 quantities(both or atleast 1 being Quantitative) we make a scatter plot and observe the trend between them
+
+## 3.7 Making soap
+```{r, warning=FALSE}
+url <- "http://ritsokiguess.site/datafiles/soap.txt"
+soap <- read_delim(url, " ")
+```
+
+Lets look at some of the data now along with some properties of our data
+`head()` -> shows first few values
+`summary()` -> characteristics of the data
+`table()` -> shows the different UNIQUE values along with their counts, under a variable preferbly used for CATAGORICAL variables
+```{r, warning = F}
+head(soap)
+summary(soap)
+
+# I use this as I found it on stackoverflow once don't use this when asked to 
+# show the result as the generated output is not clean 
+table(soap$line)
+```
+
+
+### Make a histogram from SCRAP
+To make histogram we use `geom_histogram()` with an appropriate binsize \
+
+1) what are bins? \
+The count you specify for the bins is the basic partition you are willing to make for your x values \
+2) Ideal number? \
+theory vs application. just play around and fit what is ideal \
+make sure it's never more than your actual sample size :p
+
+```{r}
+soap %>% ggplot(aes( x= scrap)) + geom_histogram(bins = 10)
+```
+3) Features of the graph
+  **Bimodail** ? type of modes
+  **Range** 
+  **Skewness?** Sym
+
+## Make a side-by-side box-plot
+`geom_boxplot()` is used to make the box-plot
+```{r}
+ggplot(soap, aes(x = line , y = scrap)) + geom_boxplot()
+```
+3) Features of the graph
+  **Range** between the 2 plants \
+  **Median**, range of a > b \
+  No **outlier** \
+  BUT there is a huge overlap between their ranges \
+  Never make inference about **MEAN** when discussing box-plot NOT reliable \
+  
+### Summary
+Histogram for distribution and spread and mode \
+bins are for dividing the range of x-values \
+Box-plot for range if values + Q1 Q3 median + outliers \
+  
+
+## 4.11
+
+### Reading the data and observing some of the data
+```{r}
+my_url <- "https://raw.githubusercontent.com/nxskok/datafiles/master/compatt.txt"
+anxiety <- read_delim(my_url," ")
+
+head(anxiety)
+```
+
+### Number of males and females in our sample
+```{r}
+# prefered way to use RESULT is a tibble
+anxiety %>% group_by(gender) %>% summarise(count = n()) 
+
+# my hacky way from stackoverflow RESULT is a console output NOT RECOMENDED for displaying results
+table(anxiety$gender) 
+```
+`group_by()` -> separates our data into different groups based on the specified variable
+`summarise()` -> used to make meaning summaries by declaring a new variable here we used `n()` and named that variable count
+
+### Mean and SD of CAS and CARS not seperated by gender
+```{r}
+anxiety %>% summarise(mean_CAS = mean(CAS), mean_CARS = mean(CARS), sd_CAS = sd(CAS), sd_CARS = sd(CARS))
+```
+Doing it without mentioning the column name
+```{r}
+anxiety %>% select(2,3) %>%
+  summarise(across(everything(), list(mean = ~mean(.), sd = ~sd(.))))
+```
+`mean()`, `sd()` -> calculates the mean and sd
+`select()` -> to choose the column with the position of the column in the dataframe
+`across()` -> to go over what the selected variables have in common
+`list()` -> used because we are doing multiple opoerations on each variable
+
+Same thing for all the quantitative variables
+```{r}
+anxiety %>% summarize(across(where(is.numeric), list(m = ~mean(.), s = ~sd(.))))
+```
+`where()` -> used to declare a conditional statement
+`is.numeric` -> the variable TYPE is numeric
+
+Again to see and compare the relation between the 2 variables in each group
+```{r}
+#general trend
+ggplot(anxiety,aes(x=CAS,y=CARS)) + geom_point() + geom_smooth(method = lm, se=F)
+# trend in each gender group
+ggplot(anxiety,aes(x=CAS,y=CARS, color = gender)) + geom_point() + geom_smooth(method = lm, se=F)
+```
+`color()` -> to separate the types in the categorical variable
+
+
+### Add and store the sum of CARS and CAS and compare the average of this SUM now between Male and Female
+```{r, warning=F}
+anxiety %>% mutate(sum = CARS + CAS) %>% group_by(gender) %>% summarise(avg = mean(sum))
+```
+with `mutate()` we are first creating this new variable and then with the `summarise()` we are finding the mean of the sum for each gender.\
+Here note we are not storing any of these changes(notice environment) right now we are just temporarily working with them and discarding them after processing our results \
+To actually store the changes just declare it to a new variable. \
+
+`mutate()` -> used to make a new variable. You declare the name of the new variable and the assignment rule for that variable
+
+### Summary
+`group_by()` -> use on catagorical variables and think of it and typing down knots based on the unique groups \
+`summarise()` -> creates summaries like mean mode median ... \
+`where()` -> used for conditional statements think \
