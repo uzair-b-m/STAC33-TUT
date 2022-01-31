@@ -1,0 +1,145 @@
+---
+title: "STAC33 TUT-3"
+author: "Uzair Mirza"
+date: "31/01/2022"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+# Introduction
+We will be discussing problems from CH:6 and CH:7 from [PASIS](https://ritsokiguess.site/pasias/one-sample-inference.html) during this week's TUT. \
+CH:6 focuses on 1-sample test while CH:7 focuses on 2-sample test. \
+
+## Example 6.7 Hunter-gatherers in Australia
+### load tidyverse
+```{r, echo=F, include=FALSE}
+library(tidyverse)
+```
+
+### a. Load Data and see how many societies were studied?
+```{r}
+source ="http://ritsokiguess.site/datafiles/hg.txt"
+societies <- read_delim(source, " ")
+head(societies)
+```
+Now let's find the count of these unique societies \
+```{r}
+# This is just for investigation PROFESSOR DOES NOT LIKE THIS
+sum(table(societies$name))
+```
+Here we know that 13 unique societies were studied. \
+
+### b. Test whether these Australian hunter-gatherer societies are like the rest of the world in terms of mean population density. State suitable null and alternative hypotheses. \
+
+FACT:  Anthropologists have studied hunter-gatherer societies in forest ecosystems across the world. The average population density of these societies is **7.38** people per $100 km^2$ \
+
+Hypothesis: \
+**NULL HYPOTHESIS** \
+$$H_{0}: \mu = 7.38$$
+**ALTERNATIVE HYPOTHESIS**
+$$H_{a}: \mu \neq 7.38$$
+Note make our hypothesis statement on the population parameters($\mu$) and infer it using the sample statistic($\hat{\mu}$). \
+So to summarise you want to test and make assumptions on the population parameters. To check these assumptions you come up with hypothesis statement. After that you move on to testing this hypothesis on your sample with the appropriate test. \
+
+### c. Test your hypotheses using a suitable test. What do you conclude, in the context of the data?
+Here note because we are not interested in the direction of the difference for the parameter(ie. NOT INTERESTED $\mu \le c$ or the other way around ) HENCE we use a **2-sided test**. \
+In a case where the direction is specified we base our $H_{a}$ accordingly. \
+We use a *One sample t-test* for this:
+```{r}
+t.test(societies$density, mu = 7.38)
+```
+  - p-value = 0.002257 < $\alpha = 0.05$
+    - p-value is the probability that $H_{0}$ is true under at $\alpha$ level.
+  - Reject the null Hypothesis
+
+### d. Validity of the results?
+Assumptions for t-test:
+ - Data is normally distributed(symmetric) -> Histogram + Box-Plot
+  - To insure this need to check data is outlier free -> Box-plot
+```{r}
+ggplot(societies, aes(x="regions", y = density)) + geom_boxplot()
+```
+ - NO outlier BUT NOT symmetric + Right skewed \
+**NOTE!!** SUPPOSE the above plot showed the result to be symmetric you still would check the distribution using a histogram. \
+This about the case with perfect Bimodial data. \
+One more check you could do is to draw up QQ-Plot for testing normality. \
+```{r}
+ggplot(societies, aes(sample= density)) + stat_qq() + stat_qq_line()
+```
+  - Lower ends are not close to the line \
+  - Hence it does not seem NORMALLY DISTRIBUTED \
+Based on the test we can conclude that the test is not reliable as it violates the assumption of normality required for t-test.
+
+### e. Case when $H_{a} < c$
+Suppose that:
+$$H_{a} < 7.38$$
+In this case we will be using a 1-sided t-test 
+```{r}
+t.test(societies$density, mu = 7.38, alternative = "less")
+```
+  - Based on the p-value > 0.05 we **retain/FAIL to reject the $H_{0}$** \
+  - Hence can say that the mean COULD BE 7.38 OR not less than 7.38 \
+
+## 7.13 Handspans of males and females
+### a. Load and observe the data and make the a sutaible plot to display the range for handspan for each group.
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/handspan.txt"
+span <- read_delim(my_url, " ")
+# view some of the data
+head(span)
+# make the suitable plot
+ggplot(span, aes(x=sex, y=handspan)) + geom_boxplot()
+```
+ - Box-Plot because -> 1 quantitative(handspan), 1 categorical(sex) variable \
+ - Comments: \
+  - Overall male > female \
+  - Potential outlier \
+  - Symmetric WO outliers \
+
+### b. Test the hypothesis that M $\geq$ F
+$$H_{a} = \mu_{M} < \mu_{F} \Longrightarrow \mu_{M} - \mu_{F} < 0 $$
+
+$$ \mu_{a} = \mu_{M} - \mu_{F} \Longrightarrow H_{a} = \mu_{a} < 0 $$
+Need to test:
+$$ H_{0} \geq 0 \quad    \quad H_{a} < 0 $$
+```{r}
+# test -> source -> group -> test data -> alternative
+t.test(handspan~sex, data=span, alternative="less")
+```
+ - based on p-value retain/fail to reject the $H_{0}$ NEVER SAY ACCEPT the null!! \
+ - Meaning that males have bigger hand span compared to females \
+ 
+### c. Consutruct a confidence interval(CI) at $\alpha = 0.1$
+What is CI? What is this $\alpha = 0.05$ \
+  - CI tells you how sure are you that the TRUE value lies between the range. \
+  - $\alpha$ is the certainty that the TRUE value lies outside the provided range. \
+  - from $\alpha$ to confidence level(CL) -> CL = 1 - $\alpha$ \
+Give sport examples to get the CI understanding: \
+  - as distance from the goal decreases confidence increases \
+  - $\alpha$ decreases as it's prob of missing the goal \
+
+So now for this example, lets do the test:
+```{r}
+conf_level = 1 - 0.1
+# test -> source -> group -> test data -> CONF.LEVEL
+t.test(handspan~sex, data=span, conf.level = 0.9)
+
+```
+On a question like this, the grader is looking for three things:
+  - getting the output
+  - saying what the interval is
+  - rounding it to a suitable number of decimals.
+The interval is −2.93 to −2.15 = males have a mean handspan between 2.15 and 2.93 inches larger than that of females
+
+
+## Common issues
+  - START EARLY!!
+  - Won't knit: Try cloud version, code-chuck issue -> eval = False
+  - loading data-set -> check out diff ways to load data
+  - IF dataset is super big then never call the data-set in a codechuck(unless asked for it) it will take super long to knit + submission will be super long
+  - ONLY state the assumptions you're sure about WITH proper reasoning.
+
+

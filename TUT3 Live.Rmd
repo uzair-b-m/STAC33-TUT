@@ -1,0 +1,115 @@
+---
+title: "Live TUT-3"
+author: "Uzair"
+date: "1/31/2022"
+output: html_document
+---
+
+# Introduction
+We will be discussing problems from CH:6 and CH:7 from [PASIS](https://ritsokiguess.site/pasias/one-sample-inference.html) during this week's TUT. \
+CH:6 focuses on 1-sample test while CH:7 focuses on 2-sample test. \
+
+## Example 6.7 Hunter-gatherers in Australia
+### load tidyverse
+```{r, echo=F, include=FALSE}
+library(tidyverse)
+```
+
+### a. Load Data and see how many societies were studied?
+```{r}
+source ="http://ritsokiguess.site/datafiles/hg.txt"
+
+```
+Now let's find the count of these unique societies \
+```{r}
+
+```
+
+### b. Test whether these Australian hunter-gatherer societies are like the rest of the world in terms of mean population density. State suitable null and alternative hypotheses. \
+
+FACT:  Anthropologists have studied hunter-gatherer societies in forest ecosystems across the world. The average population density of these societies is **7.38** people per $100 km^2$ \
+
+Hypothesis: \
+**NULL HYPOTHESIS** \
+$$H_{0}: \mu  $$
+**ALTERNATIVE HYPOTHESIS**
+$$H_{a}: \mu $$
+
+
+### c. Test your hypotheses using a suitable test. What do you conclude, in the context of the data?
+
+```{r}
+
+```
+  - p-value = 
+    - 
+  - 
+
+### d. Validity of the results?
+Assumptions for t-test:
+```{r, plots}
+
+```
+ 
+ 
+ 
+```{r, qq}
+
+```
+  
+  
+
+### e. Case when $H_{a} < c$
+Suppose that:
+$$H_{a} < 7.38$$
+In this case we will be using a 1-sided t-test 
+```{r}
+
+```
+  
+
+## 7.13 Handspans of males and females
+### a. Load and observe the data and make the a sutaible plot to display the range for handspan for each group.
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/handspan.txt"
+
+# view some of the data
+
+# make the suitable plot
+
+```
+ 
+
+### b. Test the hypothesis that M $\geq$ F
+$$H_{a} = \mu_{M} < \mu_{F} \Longrightarrow \mu_{M} - \mu_{F} < 0 $$
+
+$$ \mu_{a} = \mu_{M} - \mu_{F} \Longrightarrow H_{a} = \mu_{a} < 0 $$
+Need to test:
+$$ H_{0} \geq 0 \quad    \quad H_{a} < 0 $$
+```{r, test_2}
+
+```
+
+
+### c. Consutruct a confidence interval(CI) at $\alpha = 0.1$
+What is CI? What is this $\alpha = 0.05$ \
+
+
+So now for this example, lets do the test:
+```{r}
+
+
+```
+On a question like this, the grader is looking for three things:
+  - getting the output
+  - saying what the interval is
+  - rounding it to a suitable number of decimals.
+
+
+
+## Common issues
+  - START EARLY!!
+  - Won't knit: Try cloud version, code-chuck issue -> eval = False
+  - loading data-set -> check out diff ways to load data
+  - IF dataset is super big then never call the data-set in a codechuck(unless asked for it) it will take super long to knit + submission will be super long
+  - ONLY state the assumptions you're sure about WITH proper reasoning.
