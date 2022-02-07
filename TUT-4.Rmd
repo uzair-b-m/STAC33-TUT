@@ -9,7 +9,6 @@ output: pdf_document
 We will be discussing problems from CH:5 and CH:8 from [PASIS](https://ritsokiguess.site/pasias/one-sample-inference.html) during this week's TUT. \
 CH:5 focuses on data processing while CH:8 focuses on the relation of Power with Sample size. \
 
-## Example 8.7 Calculating power and sample size for estimating mean
 ### load tidyverse
 ```{r, echo=F, include=FALSE}
 library(tidyverse)
