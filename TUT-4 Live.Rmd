@@ -1,0 +1,188 @@
+---
+title: "TUT-4-Live"
+author: "Uzair"
+date: "2/7/2022"
+output: html_document
+---
+
+# Introduction
+We will be discussing problems from CH:5 and CH:8 from [PASIS](https://ritsokiguess.site/pasias/one-sample-inference.html) during this week's TUT. \
+CH:5 focuses on data processing while CH:8 focuses on the relation of Power with Sample size. \
+
+## Example 8.7 Calculating power and sample size for estimating mean
+### load tidyverse
+```{r, echo=F, include=FALSE}
+library(tidyverse)
+```
+
+
+## Example 5.6 Dolphins
+Polution level `mercury`, `age`, `sex`
+
+a. Read and display some of the data \
+b. Display the `mercury` and `sex` \
+- `select()` ->  \
+```{r}
+#a
+my_url <- "http://ritsokiguess.site/datafiles/dolphins.csv"
+
+
+#b
+```
+c. Display the col with Name having 3 chars \
+-Regex: [here](https://regex101.com/)  **NOT SO IMP** bc doable with online help
+```{r}
+
+```
+d. Display only the mercury levels for the females. \
+- `filter()` ->  \
+- Order matters \
+```{r}
+
+```
+e. What is the mean mercury concentration for all the dolphins whose age is less than 15? \
+- Order: \
+```{r}
+
+```
+e. What is the mean mercury concentration for all the dolphins whose age is greater than 25?
+```{r}
+
+```
+
+
+
+### The Data
+```{r data}
+# load the data set
+df <- iris
+# add some 'NA' in the data set
+df <- df %>% add_row(Sepal.Length = 5, Sepal.Width = 5,
+               Petal.Length = NA, Petal.Width = 0.2,
+               Species = "setosa")
+
+# add an outlier `.length = 25`
+df <- df %>% add_row(Sepal.Length = 21, Sepal.Width = 5,
+               Petal.Length = 3, Petal.Width = 0.2,
+               Species = "setosa")
+```
+
+
+### Goal of the study
+Sepal length to petal length ratio for the collected flowers \
+
+
+#### Get the interested Variables(columns)
+This is the case of our study are just the 3 variables; \
+  - Sepal.Length \
+  - Petal.Length \
+  - Species \
+
+
+```{r var-reduc}
+
+```
+
+
+#### Check if there are any `NA`
+
+```{r check-NA}
+
+```
+  -What is.na() does? In -> Out \
+  
+**Do we remove the `NA`**?
+  -Data is expensive to collect \
+  -Variable `NA` not so important \
+  -Size of dataset ~ Weights/value \
+   
+
+```{r remove-NA}
+
+```
+  
+#### Check for outliers + Remove them
+```{r scat-plot, fig.align='center'}
+
+```
+
+
+
+Options: \
+
+```{r filter-dem}
+
+
+```
+
+
+
+```{r out-check, fig.align='center'}
+
+```
+
+#### Get the ratios
+This will require making of a new variable `Ratio`, using `mutate()` \
+
+```{r Ratio}
+
+```
+
+
+How about arrange the ratios in acceding order \
+
+```{r arrange}
+
+```
+
+
+#### Get the average ratio for each type of flower
+Will require group_by(), summarise() \
+
+```{r grouping}
+
+```
+
+
+## What is simulation?
+
+**Why?** \
+
+## What is Power?
+
+## Example 8.7 Calculating power and sample size for estimating mean
+Goal: **ESTIMATE** a population mean \
+Facts: 
+$\sigma = 20$ \
+Aprox Normally Distributed \
+We will be testing the null hypothesis that the population mean is 100. Suppose the population mean is actually 110, and we want to determine how likely we are to (correctly) reject the null hypothesis in this case, using a two-sided (**but one-sample**) test with  $\alpha = 0.05$. \
+
+a. We will take a sample of size n = 30. **Calculate** the power of this test \
+$\delta = \mu - \mu_{0}$ (110 - 100 = 10)
+```{r}
+
+```
+
+If instead Professor Ken has mentioned **ESTIMATE** then you use the simulation method. \
+
+```{r}
+
+```
+
+
+b. Find the sample size necessary to obtain a power of at least 0.80 under these conditions. What sample size do you need? \
+```{r}
+
+```
+
+
+Similar approach BUT with simulation \
+***Same code as above, play around with the `n`***
+see what happens
+```{r}
+
+```
+
+
+
+

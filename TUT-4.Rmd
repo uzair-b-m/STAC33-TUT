@@ -1,0 +1,252 @@
+---
+title: "STAC33 TUT 4"
+author: "Uzair Mirza"
+date: "07/02/2022"
+output: pdf_document
+---
+
+# Introduction
+We will be discussing problems from CH:5 and CH:8 from [PASIS](https://ritsokiguess.site/pasias/one-sample-inference.html) during this week's TUT. \
+CH:5 focuses on data processing while CH:8 focuses on the relation of Power with Sample size. \
+
+## Example 8.7 Calculating power and sample size for estimating mean
+### load tidyverse
+```{r, echo=F, include=FALSE}
+library(tidyverse)
+```
+
+
+## Example 5.6 Dolphins
+Polution level `mercury`, `age`, `sex`
+
+a. Read and display some of the data \
+b. Display the `mercury` and `sex` \
+- `select()` -> to choose the cols \
+```{r}
+#a
+my_url <- "http://ritsokiguess.site/datafiles/dolphins.csv"
+dolphins <- read_csv(my_url)
+head(dolphins)
+
+#b
+dolphins %>% select(mercury, sex)
+```
+c. Display the col with Name having 3 chars \
+-Regex: [here](https://regex101.com/)  **NOT SO IMP** bc doable with online help
+```{r}
+dolphins %>% 
+select(matches("^...$"))
+```
+d. Display only the mercury levels for the females. \
+- `filter()` -> var + condition \
+- Order matters \
+```{r}
+dolphins %>% filter(sex == "female") %>% 
+select(mercury)
+```
+e. What is the mean mercury concentration for all the dolphins whose age is less than 15? \
+- Order: address the condition then calculate the statistic \
+```{r}
+dolphins %>% filter(age<15) %>% 
+summarize(m = mean(mercury))
+```
+e. What is the mean mercury concentration for all the dolphins whose age is greater than 25?
+```{r}
+dolphins %>% 
+group_by(age>25) %>% 
+summarize(m = mean(mercury))
+```
+
+
+
+
+
+### The Data
+```{r data}
+# load the data set
+df <- iris
+# add some 'NA' in the data set
+df <- df %>% add_row(Sepal.Length = 5, Sepal.Width = 5,
+               Petal.Length = NA, Petal.Width = 0.2,
+               Species = "setosa")
+
+# add an outlier `.length = 25`
+df <- df %>% add_row(Sepal.Length = 21, Sepal.Width = 5,
+               Petal.Length = 3, Petal.Width = 0.2,
+               Species = "setosa")
+```
+
+
+### Goal of the study
+Sepal length to petal length ratio for the collected flowers \
+
+
+#### Get the interested Variables(columns)
+This is the case of our study are just the 3 variables; \
+  - Sepal.Length \
+  - Petal.Length \
+  - Species \
+Will use `select()`, `%>%` \
+
+```{r var-reduc}
+df.1 <- df %>%
+  select(Sepal.Length, Petal.Length, Species)
+```
+
+-What is %>%, select()?
+
+#### Check if there are any `NA`
+
+What is `NA`? \
+
+Will use `any()` `is.na()` \
+```{r check-NA}
+any(is.na(df.1))
+```
+  -What is.na() does? In -> Out \
+  
+**Do we remove the `NA`**?
+  -Data is expensive to collect \
+  -Variable `NA` not so important \
+  -Size of dataset ~ Weights/value \
+   
+Remove the `NA` value, in our case.
+```{r remove-NA}
+df2 <- na.omit(df.1)
+```
+  
+#### Check for outliers + Remove them
+```{r scat-plot, fig.align='center'}
+ggplot(df2, aes(x= Sepal.Length, y= Petal.Length))  + geom_point()
+```
+Hmmm that one value!!!
+
+
+Options: \
+  - Manually go over and find this value \
+  - **Filter** this observation out \
+
+```{r filter-dem}
+df3 <- df2 %>%
+  filter(Sepal.Length < 10)
+
+```
+  -`filter()` In -> Out \
+  - Multiple logical statements & |  \
+
+
+```{r out-check, fig.align='center'}
+ggplot(df3, aes(x= Sepal.Length, y= Petal.Length))  + geom_point()
+```
+
+#### Get the ratios
+This will require making of a new variable `Ratio`, using `mutate()` \
+
+```{r Ratio}
+df3 <- df3 %>%
+  mutate(Ratio = Sepal.Length/Petal.Length )
+```
+  -What `mutate()` is \
+
+How about arrange the ratios in acceding order \
+
+```{r arrange}
+df3 <- df3 %>% arrange(desc(Ratio))
+```
+
+
+#### Get the average ratio for each type of flower
+Will require group_by(), summarise() \
+
+```{r grouping}
+
+df3 %>% 
+  group_by(Species) %>%
+  summarise(n = n(),
+            AvgRatio = sum(Ratio)/n)
+```
+
+
+## What is simulation?
+When you have facts(estimate about means, SD, distribution) about the population and would like to do some studies. So instead of sampling from the population you work with these facts to construct samples to study. \
+**Why?** \
+Because cheaper \
+Easy to study and generate \
+Reliable (bc of LLN) \
+
+## What is Power?
+- Prob of correctly rej the $H_{0}$ \
+- Not making Type 2 error \
+- That is the resulting p-value < $\alpha$ \
+
+- Power relation with sample-size of simulation \
+LLN
+
+## Example 8.7 Calculating power and sample size for estimating mean
+Goal: **ESTIMATE** a population mean \
+Facts: 
+$\sigma = 20$ \
+Aprox Normally Distributed \
+We will be testing the null hypothesis that the population mean is 100. Suppose the population mean is actually 110, and we want to determine how likely we are to (correctly) reject the null hypothesis in this case, using a two-sided (**but one-sample**) test with  $\alpha = 0.05$. \
+
+a. We will take a sample of size n = 30. **Calculate** the power of this test \
+$\delta = \mu - \mu_{0}$ (110 - 100 = 10)
+ 
+```{r}
+power.t.test(n=30,delta=10,sd=20, type="one.sample", alternative="two.sided")
+```
+
+If instead Professor Ken has mentioned **ESTIMATE** then you use the simulation method. \
+Run your simulation `sim = 1:1000`. Get the sample `rnorm(30, 110, 20)` -> Calculate the test-stat `t.test(samples, mu = 100)` + p-value for each simulation. \
+Count the ratio of p-value < $\alpha$ OVER THE simulation size \
+This is your estimated power. \
+```{r}
+set.seed(420)
+
+tibble(sim = 1:1000) %>%
+  rowwise() %>%
+  mutate(samples = list(rnorm(30, 110, 20))) %>%
+  mutate(ttest = list(t.test(samples, mu = 100))) %>% 
+  mutate(pvals = ttest$p.value) %>% 
+  count(pvals<=0.05)
+  
+# power estimate
+772/1000
+```
+
+
+b. Find the sample size necessary to obtain a power of at least 0.80 under these conditions. What sample size do you need? \
+```{r}
+power.t.test(delta=10,power=0.80,sd=20,type="one.sample",alternative="two.sided")  
+```
+ALWAYS ROUND UP `n` as it is integer and we need **AT LEAST** .8. \
+
+Similar approach BUT with simulation \
+***Same code as above, play around with the `n`***
+see what happens
+```{r}
+tibble(sim = 1:1000) %>%
+  rowwise() %>%
+  mutate(samples = list(rnorm(35, 110, 20))) %>%
+  mutate(ttest = list(t.test(samples, mu = 100))) %>% 
+  mutate(pvals = ttest$p.value) %>% 
+  count(pvals<=0.05)
+
+
+# make a function
+sim_power = function(n){
+  tibble(sim = 1:1000) %>%
+  rowwise() %>%
+  mutate(samples = list(rnorm(n, 110, 20))) %>%
+  mutate(ttest = list(t.test(samples, mu = 100))) %>% 
+  mutate(pvals = ttest$p.value) %>% 
+  count(pvals<=0.05)
+}
+
+sim_power(34)
+
+```
+
+
+
+
