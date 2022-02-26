@@ -1,0 +1,146 @@
+---
+title: "STAC33 TUT 6"
+author: "Uzair Mirza"
+date: "26/02/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, message=FALSE}
+library(tidyverse)
+library(smmr)
+```
+
+# Introduction
+This week's lecture we will be discussing topics from Ch:10 and Ch:13. Chapter 10 is about **Mood Median test** and Chapter 13 is about **ANOVA**(aka ANalysis Of VAriance). All the problems being discussed can be found on the PASIAS [here](https://ritsokiguess.site/pasias/)
+
+
+## Question: 10.6 Fear of math
+2 courses are refered to students suffering from math labelled A and B. 10 student are chosen at random for one of the two courses. Once the course was over their math phobia score was recorded on a scale of [0,10]
+
+### a) Read the data and check we have 5 observations for each variable
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/mathphobia.txt"
+math <- read_delim(my_url, " ")
+
+#check the count for each courses
+table(math$course) #not prefered 
+math %>% count(course) #prefered
+math %>% group_by(course) %>% summarise(count = n()) #prefered
+```
+### b) Do a two-sample t-test to assess whether there is a difference in mean phobia scores after the students have taken the two courses. What do you conclude?
+```{r}
+t.test(phobia ~ course, data = math)
+```
+- What to include? \
+  From the test: \
+    $H_{0}$ There is no diffrence in mean score between the 2 courses $\mu = 0$ \
+    $H_{a}$ There is a diffrence in mean score between the 2 courses $\mu \neq 0$ \
+  From the results: \
+    p-value = 0.4456 which is > $\alpha = 0.05$. \
+    Hence we **fail to reject the $H_{0}$ ** at $\alpha$ level of significance meaning there is no evidence at all that the
+mean math phobia scores are different between the two courses. \
+
+### c) Draw boxplots of the math phobia scores for each group (one line of code). What is the most striking thing that you notice?
+```{r}
+ggplot(math, aes(x = course, y = phobia)) + geom_boxplot()
+```
+  - Boxplot `a` -> The bar across the middle is actually at the top, and it has no bottom.\
+  - Boxplot b is hugely spread out. \
+  - Median(2Q) seems equal but not the others(EXPLAIN THIS in abit detial) \
+  
+### d) Explain briefly why a t-test would not be good for these data. (There are two things that you need to say.)
+```{r}
+ggplot(math, aes(sample = phobia)) +
+  stat_qq() + stat_qq_line() + # adding the QQ line
+  facet_wrap(~course, ncol = 1, scales = "free") # not matching the scales
+
+```
+- 1 \
+t.test relies on **normality**, normality is strongly linked to sample size(CLT) min n = 20 in each ground. Here we don't see this. \
+`a` is not symetric at all `b` is fairly symetric BUT **sample size**!!.
+Also recall what we're testing in a t.test? \
+$\mu$ what happens to the sensitivity of mean when data is limited (LLN) can't kick in. So here bc of the sample size being small and `a` not looking normal we can't go ahead with a t-test. \
+  
+```{r}
+median_test(math, phobia, course)
+```
+  - fail to reject the $H_{0}$ \
+  - BUT look at the details `above`, `below` \
+Hence we can just by looking at the median and the table make conclusion about the test. \
+
+## ANOVA
+What test to use ?
+if the response variable(`y`) is **normal enough** and the spreads are about equal, considering sample size(CLT), it's regular `aov()`. \
+
+ANOVA followed by Tukey; if normality is ok but **equal spreads is not**, it's Welch ANOVA `oneway.test()`. \
+If **normality fails** altogether it's Mood's median test on multiple groups, \
+
+## Question: 13.13 Atomic weight of carbon
+This study is intended to compare two different methods (labelled 1 and 2) for measuring the atomic weight of carbon (which is known in actual fact to be 12). Fifteen samples of carbon were used; ten of these were assessed using method 1 and the remaining five using method 2. The primary interest in this particular study is to see whether there is a difference in the mean or median atomic weight as measured by the two methods. \
+
+### a) Read data and display some of it
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/carbon.txt"
+carbon <- read_delim(my_url, " ")
+
+carbon
+```
+### b) Make an appropriate plot to compare the measurements obtained by the two methods + comment on the plots
+
+-To check the range/spread of weights between the 2 methods \
+```{r}
+ggplot(carbon, aes(x = factor(method), y = weight)) + geom_boxplot()
+```
+  - The **median for method 1 is a little bit lower than for method 2** (the means are probably more different, given the shapes of the boxes). \
+  - The **spread for method 2 is a lot bigger**. \
+  - As for shape, the **method 2 measurements seem more or less symmetric** (the whiskers are equal anyway, even if the position of the median in the box isn’t).\ 
+  - Method 1 measurements have a low outlier.\
+
+
+
+-To check the distribution/Skewness/Spread \
+```{r}
+ggplot(carbon, aes(x = weight)) + geom_histogram(bins = 5) +
+  facet_wrap(~method, ncol = 1)
+```
+- **Method 2 histogram has a slightly higher centre and definitely bigger spread**.\
+- **histogram for method 1, the distribution looks skewed left**.\
+
+### c) Carry out the most appropriate t-test.
+-Will do Welch Two Sample t-test;\
+  - if we notice **groups have different spreads**
+  - code:
+```{r}
+t.test(weight ~ method, data = carbon)
+```
+  
+
+**If**, you thought the **spreads were equal enough**, then you should do the **pooled t-test here**, which goes like this:
+```{r}
+t.test(weight ~ method, data = carbon, var.equal = T)
+```
+**Testing variances**:\
+F-test for
+```{r}
+var.test(weight ~ method, data = carbon)
+```
+Assumption: \
+  - dependent on the data in the two groups being approximately normal. \
+  - testing **variances** ratio rather than means, there is no Central Limit Theorem to rescue us for large samples(variance won't converge with sample size n increasing) \
+In our case we don't satisfy the assumptions hence we need something else. \
+
+**Levene’s test.** \
+Desn’t depend on normality. \
+```{r, message=FALSE}
+library(car)
+leveneTest(weight ~ factor(method), data = carbon)
+```
+
+From both the tests we can be sure that variance between the groups is similar, so from that point of view there is no evidence against using the pooled t-test. \
+
+### d) Do the most appropriate test you know that does not assume normally-distributed data.
+Moods-Median test
+```{r}
+median_test(carbon, weight, method)
+```
+The P-value is less than 0.10 but not less than 0.05, so it doesn’t quite reach significance by the usual standard. But if you look up at the table, the frequencies seem rather unbalanced: 6 out of the remaining 9 weights in group 1 are below the overall median, but 4 out of 5 weights in group 2 are above. This seems as if it ought to be significant, but bear in mind that the sample sizes are small, and thus **Mood’s median test needs very unbalanced frequencies**, which we don’t quite have here.
