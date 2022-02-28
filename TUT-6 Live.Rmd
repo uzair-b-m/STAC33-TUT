@@ -1,9 +1,10 @@
 ---
-title: "STAC33 TUT 6"
+title: "TUT-6 Live"
 author: "Uzair Mirza"
-date: "26/02/2022"
+date: "28/02/2022"
 output: pdf_document
 ---
+
 
 ```{r setup, include=FALSE, message=FALSE}
 library(tidyverse)
@@ -23,29 +24,29 @@ my_url <- "http://ritsokiguess.site/datafiles/mathphobia.txt"
 math <- read_delim(my_url, " ")
 
 #check the count for each courses
-table(math$course) #not preferred 
-math %>% count(course) #preferred
-math %>% group_by(course) %>% summarise(count = n()) #preferred
+
+
 ```
 ### b) Do a two-sample t-test to assess whether there is a difference in mean phobia scores after the students have taken the two courses. What do you conclude?
 ```{r}
-t.test(phobia ~ course, data = math) #familiar with this syntax
+
+
 ```
 - What to include? \
   From the test: \
-    $H_{0}:$ There is no difference in mean score between the 2 courses $\mu = 0$ \
-    $H_{a}:$ There is a difference in mean score between the 2 courses $\mu \neq 0$ \
+    $H_{0}:$ There is _______ in mean score between the 2 courses $\mu  0$ \
+    $H_{a}:$ There is _______ in mean score between the 2 courses $\mu  0$ \
   From the results: \
-    p-value = 0.4456 which is > $\alpha = 0.05$. \
-    Hence we **fail to reject the $H_{0}$ ** at $\alpha$ level of significance meaning there is no evidence at all that the mean math phobia scores are different between the two courses. \
+    p-value = _____ which is  $\alpha = 0.05$. \
+    Hence we **__________ the $H_{0}$ ** at $\alpha$ level of significance meaning there ________________   mean math phobia scores are different between the two courses. \
 
 ### c) Draw boxplots of the math phobia scores for each group (one line of code). What is the most striking thing that you notice?
 ```{r}
-ggplot(math, aes(x = course, y = phobia)) + geom_boxplot()
+
 ```
-  - Boxplot `a` -> The bar across the middle is actually at the top, and it has no bottom.\
-  - Boxplot b is hugely spread out. \
-  - Median(Q2) seems equal but not the other quartiles(EXPLAIN THIS in abit detial) \
+  - Boxplot `a` -> _____________ .\
+  - Boxplot b ->  ___________. \
+  - Median(2Q) _____________ \
   
 ### d) Explain briefly why a t-test would not be good for these data. (There are two things that you need to say.)
 ```{r}
@@ -55,12 +56,13 @@ ggplot(math, aes(sample = phobia)) +
 
 ```
 - 1 \
-t.test relies on **normality**, normality is strongly linked to sample size(CLT) min n = 20 in each group. Here we don't see this. \
-`a` is not symetric at all `b` is fairly symetric BUT **sample size**!!.
-Also recall what we're testing in a t.test? \
-$\mu$ what happens to the sensitivity of mean when data is limited (LLN) can't kick in. So here bc of the sample size being small and `a` not looking normal we can't go ahead with a t-test. \
+t.test relies on ________, 
 
-we use `median_test(data, variable, group)` 
+`a` ____ symetric at all `b` is ____ symetric BUT !!.
+Also recall what we're testing in a t.test? \
+$\mu$ what happens to the sensitivity of mean when data is limited 
+  
+
 ```{r}
 median_test(math, phobia, course)
 ```
@@ -89,12 +91,17 @@ carbon
 
 -To check the range/spread of weights between the 2 methods \
 ```{r}
-ggplot(carbon, aes(x = factor(method), y = weight)) + geom_boxplot()
+ggplot(carbon, aes(x = factor(method), y = weight)) +
+  geom_*****() #boxplot OR side-by-sideHistogram
 ```
-  - The **median for method 1 is a little bit lower than for method 2** (the means are probably more different, given the shapes of the boxes). \
-  - The **spread for method 2 is a lot bigger**. \
-  - As for shape, the **method 2 measurements seem more or less symmetric** (the whiskers are equal anyway, even if the position of the median in the box isn’t).\ 
-  - Method 1 measurements have a low outlier.\
+  # Median Comparison \
+  - . \ 
+  # Spread comparison \
+  -  \
+  # Skewness/Symetric
+  - .\
+  # Outlier?
+  - .\
 
 
 
@@ -103,7 +110,7 @@ ggplot(carbon, aes(x = factor(method), y = weight)) + geom_boxplot()
 ggplot(carbon, aes(x = weight)) + geom_histogram(bins = 5) +
   facet_wrap(~method, ncol = 1)
 ```
-- **Method 2 histogram has a slightly higher center and definitely bigger spread**.\
+- **Method 2 histogram has a slightly higher centre and definitely bigger spread**.\
 - **histogram for method 1, the distribution looks skewed left**.\
 
 ### c) Carry out the most appropriate t-test.
@@ -111,19 +118,18 @@ ggplot(carbon, aes(x = weight)) + geom_histogram(bins = 5) +
   - if we notice **groups have different spreads**
   - code:
 ```{r}
-t.test(weight ~ method, data = carbon)
+
 ```
   
 
 **If**, you thought the **spreads were equal enough**, then you should do the **pooled t-test here**, which goes like this:
 ```{r}
-t.test(weight ~ method, data = carbon, var.equal = T)
+
 ```
 **Testing variances**:\
-F-test for variance \
+F-test for
 `var.test(variable_being_tested ~ group_being compared, data = source)`
 ```{r}
-var.test(weight ~ method, data = carbon)
 ```
 Assumption: \
   - dependent on the data in the two groups being approximately normal. \
@@ -131,18 +137,27 @@ Assumption: \
 In our case we don't satisfy the assumptions hence we need something else. \
 
 **Levene’s test.** \
-Doesn’t depend on normality. \
+Desn’t depend on normality. \
 `leveneTest(variable ~ factor(group), data = source)`
 ```{r, message=FALSE}
 library(car)
-leveneTest(weight ~ factor(method), data = carbon)
 ```
 
-From both the tests we can be sure that variance between the groups is similar, so from that point of view there is no evidence against using the pooled t-test. \
+
 
 ### d) Do the most appropriate test you know that does not assume normally-distributed data.
 Moods-Median test
 ```{r}
-median_test(carbon, weight, method)
+
 ```
+
+
+
+
+
+
+
+
+
+
 The P-value is less than 0.10 but not less than 0.05, so it doesn’t quite reach significance by the usual standard. But if you look up at the table, the frequencies seem rather unbalanced: 6 out of the remaining 9 weights in group 1 are below the overall median, but 4 out of 5 weights in group 2 are above. This seems as if it ought to be significant, but bear in mind that the sample sizes are small, and thus **Mood’s median test needs very unbalanced frequencies**, which we don’t quite have here.
