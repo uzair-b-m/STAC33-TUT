@@ -49,16 +49,17 @@ codeXmeaning
 Essentially we are trying to find when there was a change in `code` status for our recorded dates ie Event starts specefic generated code is issued, event ends the specific generated code is generated. \
 So we are trying to find the case when the difference between these code changes was more than 1. \
 
-`as.numeric(date)` -> counts the number of days it has been since a specefic date(some date in 1970) \
-`diff()` -> takes a diffrence st; given tupple x our result y is generated such as. \ y[i] = x[i+1] - x[i]. \
-For the last value we compare it with itself, hence diff is always 0.
 ```{r}
 heat %>%
-  select(-text) %>%
-  mutate(daycount = as.numeric(date)) %>%
-  mutate(daydiff = abs(c(diff(daycount), 0))) %>%
-  count(daydiff != 1)
+  select(-text) %>% #drops the variable
+  mutate(daycount = as.numeric(date)) %>% # gets the date diffrence from a standard date(1970)
+  mutate(daydiff = abs(c(diff(daycount), 0))) %>% #
+  count(daydiff != 1) #
 ```
+
+`as.numeric(date)` -> counts the number of days it has been since a specific date(some date in 1970) \
+`diff()` -> takes a difference st; given tupple x our result y is generated such as. \ y[i] = x[i+1] - x[i]. \
+For the last value we compare it with itself, hence diff is always 0.
 
 ### d. We are going to investigate how many heat alert days there were in each year.
 To do that, we have to extract the year from each of our dates and work with the data \
@@ -70,9 +71,9 @@ Function `year()` extracts the year from the date and stores it an  `dbl` \
 # the library needed for the function call year()
 library(lubridate)
 
-# this gets us the date
+# 
 heat %>% select(-text) %>% mutate(year = year(date))
-# now we count each of these Unique years
+# gets the count of unique years
 heat %>% select(-text) %>% mutate(year = year(date)) %>% count(year)
 ```
 
@@ -93,7 +94,7 @@ So here each observation in the table has the value of the sleep time of the mic
 Note it is not really useful in terms of testing when working with data in this format. Instead let us try to improve on it to get in in a format to carry out tests and make plots.
 
 ### b. Transform this data frame into one that you could use for modelling or making graphs.
-GOAL: get a col so we have the sleep time for each observation under a specefic variable `sleeptime` . \
+GOAL: get a col so we have the sleep time for each observation under a specific variable `sleeptime` . \
 `pivot_longer()` is the function to use. `it takes in a WIDE data frame and makes it LONGER; reduces the number of col and increases the number of rows
 
 ```{r}
@@ -103,7 +104,7 @@ GOAL: get a col so we have the sleep time for each observation under a specefic 
 (sleep1 %>% 
   pivot_longer(-treatment, names_to="rep", values_to="sleeptime") -> sleep)
 ```
-`names_to= ` -> the col being concacinated into the new varible \
+`names_to= ` -> the col being concatenated into the new variable \
 `value_to=` -> assigning to the new variable. \
 
 ### c. Using your new data frame, make side-by-side boxplots of sleep time by treatment group.
@@ -112,23 +113,23 @@ ggplot(sleep, aes(x = treatment, y = sleeptime)) + geom_boxplot()
 ```
 
 ### d. In your boxplots, how does the median sleep time appear to depend on treatment group?
-Differs between the groups. \
+Differs between the groups... \
 
 
 ## 17.18 Location, species and disease in plants
 Reading the table and what the variables are.\
 2 Species, A and B \
-Plausiable location for the disease X and Y \
+Plausible location for the disease X and Y \
 Disease present or absent  P and A. \
 ```{r}
 my_url <- "http://ritsokiguess.site/datafiles/disease.txt"
 tbl <- read_table(my_url)
 
-tbl
+view(tbl)
 ```
 
 Lets make it tidy with the goal to make sense of the data. \
-GOAL: We want to observe the frequencies in each catogery. So lets start with creating that variable. \
+GOAL: We want to observe the frequencies in each category. So lets start with creating that variable. \
 ```{r}
 tbl %>% pivot_longer(-Species, names_to="disloc", values_to = "frequency") -> tbl.2
 tbl.2
@@ -140,3 +141,10 @@ We notice it is a character of len 2, hence separation based on the first charac
 ```{r}
 (tbl.2 %>% separate(disloc, c("disease", "location"), 1) -> tbl.3)
 ```
+
+
+
+## More
+So you can read about some more useful functions on the [website](https://ritsokiguess.site/pasias/tidying-data.html). \
+`pivot_wider` -> Opposite is pivot longer, 17.19 Mating songs in crickets \
+`unite` -> Joins values of col into a single col, 17.19 Mating songs in crickets \
