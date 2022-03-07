@@ -24,7 +24,7 @@ heat <- read_csv(my_url)
 
 view(heat)
 ```
-Specefically in this dataset the new types of data is `date`. \
+Specifically in this dataset the new types of data is `date`. \
 Note the data file contains the dates in **year-month-day** order hence read_csv is able to recognise this. \
 Having dates in `date` format allows us to work with them in an easier way(we can  specify ranges and etc.) \
 
@@ -46,8 +46,8 @@ codeXmeaning
 ```
 
 ### c. How many (regular and extended) heat alert events are there altogether? A heat alert event is a stretch of consecutive days, on all of which there is a heat alert or extended heat alert
-Essentially we are trying to find when there was a change in `code` status for our recorded dates ie Event starts specefic generated code is issued, event ends the specefic generated code is generated. \
-So we are trying to find the case when the diffrence between these code changes was more than 1. \
+Essentially we are trying to find when there was a change in `code` status for our recorded dates ie Event starts specefic generated code is issued, event ends the specific generated code is generated. \
+So we are trying to find the case when the difference between these code changes was more than 1. \
 
 `as.numeric(date)` -> counts the number of days it has been since a specefic date(some date in 1970) \
 `diff()` -> takes a diffrence st; given tupple x our result y is generated such as. \ y[i] = x[i+1] - x[i]. \
@@ -135,8 +135,8 @@ tbl.2
 ```
 Lets improve on it. \
 GOAL: split `disloc` into 2 variables which can account for whether the disease is present or absent and the location of the disease. \
-We notice it is a chracter of len 2, hence seperation based on the first chracter will do the job. \
-`seprate(variable, c("new_a","new_b"), c)`. Here the `variable` is the variable in the df we are splitting, `c("new_a","new_b")` are the new variables it is being split into. `c` is the length of the spliting point for the variable. 
+We notice it is a character of len 2, hence separation based on the first character will do the job. \
+`seprate(variable, c("new_a","new_b"), c)`. Here the `variable` is the variable in the df we are splitting, `c("new_a","new_b")` are the new variables it is being split into. `c` is the length of the spiting point for the variable. 
 ```{r}
 (tbl.2 %>% separate(disloc, c("disease", "location"), 1) -> tbl.3)
 ```
