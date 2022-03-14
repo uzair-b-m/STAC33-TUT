@@ -1,0 +1,123 @@
+---
+title: "TUT-8"
+author: "Uzair Mirza"
+date: "14/03/2022"
+output: pdf_document
+---
+```{r setup, include=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+# Introduction
+This week's lecture we will be discussing topics from Ch:17. Chapter 17 is about **Tidying Data**. All the problems being discussed can be found on the PASIAS [here](https://ritsokiguess.site/pasias/) \
+
+Specifically we will be focusing on `pivot_wider` for this week. \
+
+## Q17.24 Jocko’s Garage
+Insurance companies are scepticale Joko is running a scam and giving higher estimates than the standard market. To investigate this sample of 10 cars involved in a crash are taken to his garage and another garage to get estimates. \
+
+### a. Read and observe the data
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/jocko.txt"
+cars0 <- read_table(my_url, col_names = FALSE) # reads 1st row as data
+
+cars0
+```
+We see that we `Xi` are variables we have to make sense of and rename them as we move forward. \
+
+### b. Make this data set tidy. That is, you need to end up with columns containing the repair cost estimates at each of the two garages and also identifying the cars, with each observation on one row. Describe your thought process.
+
+Let us first make it longer and see what it looks like. We will keep variable `X1` `X2` and make the rest longer. \
+```{r}
+cars0 %>% pivot_longer(X3:X7, names_to="old_cols", values_to="values") 
+```
+From 6 observations we have gone to 30. \
+Still no where to make much sense. 
+
+Let's work on it. It is now that we will be using `pivot_wider()` \
+What does `pivot_wider()` do?
+Takes a catgorical variable, makes the unique catogeries as a variable and fills in the related data under the new variables.  \
+Hence the dimention in terms of rows decreases and cols increases. \
+Let's see what it looks like. \
+
+`names_from = col_name` is the catogorical variable we are interested to make into individual variables. \
+```{r}
+(cars0 %>% pivot_longer(X3:X7, names_to="names", values_to="values") %>% 
+pivot_wider(names_from = X2, values_from = values) -> cars)
+
+(cars.1 <- cars %>% select(Car, Jocko, Other))
+```
+What can we observe? \
+Especially for the `X2` col. Note the number of new variables generated. \
+
+Note with this data we con perform our hyp testing or make sutiable plots to investigate the trend. \
+
+### c. Now observe the trend and investigate if he is charging more.
+Now if we get a scatter plot and plot a $y=x$ line would tell us if he is charging extra. \
+Depending on the region where most of the points lie. either `y>x` or `y<x` \
+
+```{r}
+ggplot(cars, aes(x=Jocko, y=Other)) + geom_point() + geom_abline(slope = 1, intercept = 0)
+```
+Let us also look at Spegetti Plots. \
+Used to observe trends or observe the changes as we progress in diff catogeries. \
+Lets get the data in the right format first. In order to do this let's make it longer first because we are in 2-d lets get the catagorical variables(The garages) into 1 variable which goes on the x-axis and the estimates will be on the y-axis. \ 
+```{r}
+# Making the data longer
+(cars.1 %>% pivot_longer(-Car, names_to = "garage", values_to = "estimate" ) -> cars.12)
+
+#Making the spegetti plot
+ggplot(cars.12, aes(x=garage, y=estimate, group=Car)) + geom_point() + geom_line()
+```
+Majority of the lines are going downhill hence we have slight visual evidence that Jocko is messing around. \
+
+Might want to do a t.test to further verify? \
+(Well CLT check before) \
+If fails then perhaps median or variance test.
+
+ 
+## 17.26 Tidy blood pressure
+Basic study that measures patients systolic heart pressure before and after an appoinment. \
+
+### a. Read and display the data
+```{r}
+my_url <- "http://ritsokiguess.site/datafiles/blood_pressure2.csv"
+(bp0 <- read_csv(my_url))
+```
+
+Why is this data not tidy? \
+values under `time` should have their own col. -> `pivot_wider()` ?
+`pi` should be observation in rows. \
+
+### b. make it tidy
+Lets first make our data longer ie. make the `pi` as rows and assign the values into 1 column. This would result in increasing the rows of the dataset. \
+
+```{r}
+(bp0 %>% pivot_longer(-time, names_to="person", values_to="bp") ->bp0.1)
+```
+Lets make the data abit wider now and get the `before` & `after` variable. \
+```{r}
+(bp0.1 %>% pivot_wider(names_from = time, values_from = bp) -> blood_pressure)
+```
+### c. observe the trend
+again if it's equal most points should lie CLOSE to or on the $y=x$ line.
+```{r}
+ggplot(blood_pressure, aes(x=before, y=after)) + geom_point() +
+geom_abline(intercept = 0, slope = 1)
+```
+We can see that before entering their BP is higher. \
+
+
+### d. get data in the right format to make spegetti plots and plot the spegetti plot.
+We need before and after under 1 variable and their values under 1 variable \
+
+```{r}
+# getting data in the right format
+(blood_pressure %>% pivot_longer(-person, names_to = "time", values_to = "bp" ) -> bp.1)
+
+# making the spegetti plot
+## lets get the dots on the plot
+bp.1 %>% ggplot(aes(x=time, y=bp)) + geom_point()
+## lets connect these dots for each person
+bp.1 %>% ggplot(aes(x=time, y=bp, group=person)) + geom_point() + geom_line()
+```
