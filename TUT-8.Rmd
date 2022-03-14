@@ -14,7 +14,7 @@ This week's lecture we will be discussing topics from Ch:17. Chapter 17 is about
 Specifically we will be focusing on `pivot_wider` for this week. \
 
 ## Q17.24 Jocko’s Garage
-Insurance companies are scepticale Joko is running a scam and giving higher estimates than the standard market. To investigate this sample of 10 cars involved in a crash are taken to his garage and another garage to get estimates. \
+Insurance companies are skeptical Joko is running a scam and giving higher estimates than the standard market. To investigate this sample of 10 cars involved in a crash are taken to his garage and another garage to get estimates. \
 
 ### a. Read and observe the data
 ```{r}
@@ -60,7 +60,7 @@ Depending on the region where most of the points lie. either `y>x` or `y<x` \
 ggplot(cars, aes(x=Jocko, y=Other)) + geom_point() + geom_abline(slope = 1, intercept = 0)
 ```
 Let us also look at Spegetti Plots. \
-Used to observe trends or observe the changes as we progress in diff catogeries. \
+Used to observe trends or observe the changes as we progress in diff categories. \
 Lets get the data in the right format first. In order to do this let's make it longer first because we are in 2-d lets get the catagorical variables(The garages) into 1 variable which goes on the x-axis and the estimates will be on the y-axis. \ 
 ```{r}
 # Making the data longer
@@ -121,3 +121,5 @@ bp.1 %>% ggplot(aes(x=time, y=bp)) + geom_point()
 ## lets connect these dots for each person
 bp.1 %>% ggplot(aes(x=time, y=bp, group=person)) + geom_point() + geom_line()
 ```
+
+
