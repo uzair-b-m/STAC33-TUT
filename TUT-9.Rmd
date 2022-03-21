@@ -1,0 +1,142 @@
+---
+title: "STAC33 TUT-9"
+author: "Uzair"
+date: "3/20/2022"
+output: pdf_document
+---
+```{r setup, include=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+# Introduction
+This week's lecture we will be discussing topics from Ch:18. Chapter 18 is about **Simple Regression**. All the problems being discussed can be found on the PASIAS [here](https://ritsokiguess.site/pasias/)
+
+
+## 18.24 Running and blood sugar
+Diabetic patient measures is **blood sugar** level after a run for a particular **distance**. \
+
+### a. Load the data and make a sutiable plot
+```{r}
+## loading the data
+my_url <- "http://ritsokiguess.site/datafiles/runner.txt"
+runs <- read_delim(my_url, " ")
+runs
+
+## making the scatter plot
+ggplot(runs, aes(x = distance, y = blood_sugar)) + geom_point() +
+  geom_smooth()
+```
+
+
+## b. Based on the above plot can we say that the relationship is linear or not?
+There seems to be a linear relationship, as there seems to be a lack of curvature/variability in the overall trend. \
+
+## c. Fit a regression model and obtain the model details
+`lm` -> fit the model \
+`summary` -> gets the model diagnostics and details \
+```{r}
+# fitting model for blood sugar level against the distance run
+runs.1 <- lm(blood_sugar ~ distance, data = runs)
+# getting the summary of the model
+summary(runs.1)
+```
+
+## d. What does the slope tell you about this model wrt. our data?
+The slope is  -25.37. This means that for each additional mile run, the runner’s blood sugar will decrease on average by about 25 units. \
+
+## e. Is there a (statistically) significant relationship between running distance and blood sugar? How do you know? Do you find this surprising, given what you have seen so far? Explain briefly.
+Recall the t-test being conducted here: Null = $\beta_{i0} = 0$ that is the relationship is not significant. \
+
+Look at the P-value either on the distance line (for its t-test) or for the F-statistic on the bottom line. These are the same: 0.000000023. (They will be the same any time there is one x-variable.) This P-value is way smaller than 0.05, so there is a significant relationship between running distance and blood sugar. \
+
+## f. This diabetic is planning to go for a 3-mile run tomorrow and a 5-mile run the day after. Obtain suitable 95% intervals that say what his blood sugar might be after each of these runs.
+`predict` -> used to get the prediction interval
+```{r}
+# declaring the two values of interest in a tibble
+dists <- c(3, 5)
+dist.new <- tibble(distance = dists)
+dist.new
+
+# getting their prediction intervals
+pp <- predict(runs.1, dist.new, interval = "p")
+pp
+
+# combining the results 
+cbind(dist.new, pp)
+```
+
+Blood sugar after a 3-mile run is predicted to be between 104 and 127; after a 5-mile run it is predicted to be between 52 and 77.5. \
+
+## g. Which one of the prediction interval is longer? Explain
+Prediction interval closer to the observed values will have a narrower range than prediction intervals far from the observed values. \
+
+```{r}
+cbind(dist.new, pp) %>% mutate(int.length = -lwr + upr)
+```
+The intervals are about 22.25 and 25.5 units long. The one for a 5-mile run is a bit longer. I think this makes sense because 3 miles is close to the average run distance, so there is a lot of “nearby” data. 5 miles is actually longer than any of the runs that were actually done (and therefore we are actually extrapolating), but the important point for the prediction interval is that there is less nearby data: those 2-mile runs don’t help so much in predicting blood sugar after a 5-mile run. \
+
+
+# 18.28 Predicting height from foot length
+Goal is to predict the height from the footlength of the people. \
+We have 33 male entries in this dataset. \
+
+## a. Read data and make sutiable plots
+```{r}
+# read in the data 
+my_url <- "http://ritsokiguess.site/datafiles/heightfoot.csv"
+hf <- read_csv(my_url)
+
+# make a scatterplot with trend line along with CI-bands
+ggplot(hf, aes(y=height, x=foot)) + geom_point() + geom_smooth()
+
+```
+## b. Are there any observations not on the trend of the other points? What is unusual about those observations?
+The observation with height greater than 80 at the top of the graph looks like an outlier and does not follow the trend of the rest of the points. Or, this individual is much taller than you would expect for someone with a foot length of 27 inches. Or, this person is over 7 feet tall, which makes little sense as a height. Say something about what makes this person be off the trend. \
+
+## c. Fit a regression predicting height from foot length, including any observations that you identified in the previous part. For that regression, plot the residuals against the fitted values and make a normal quantile plot of the residuals.
+```{r}
+hf.1 <- lm(height~foot, data=hf)
+summary(hf.1)
+```
+Cool we know about the relationship and significance tests. \
+
+```{r}
+# to check the assumption about normality of the residuals
+ggplot(hf.1, aes(sample=.resid)) + stat_qq() + stat_qq_line()
+```
+That one point is still waay off. \
+
+## d. Remove that problem point and carry out similar steps as you did previously 
+We notice the max height is 80 so remove the point that has height greater than 80. \
+we use `filter()` -> to filter based on a logical statement. \
+```{r}
+hf %>% filter(height<80) -> hfx
+hfx
+```
+Running the model on the new dataset.
+```{r}
+hf.2 <- lm(height~foot, data=hfx)
+summary(hf.2)
+```
+Improved $R^2$ \
+**Model Diagnostics time** \
+Checking normality for our residuals \
+Fitted x Residual plot \
+```{r}
+ggplot(hf.2, aes(x=.fitted, y=.resid)) + geom_point()
+```
+Making QQ-plot \
+```{r}
+ggplot(hf.2, aes(sample=.resid)) + stat_qq() + stat_qq_line()
+```
+Looks fine as points are close to the line. \
+Hence we can be satisfied with the results we have. \
+
+## Questions you can expect 
+Interpretation of model coefficients \
+Statistical Significance of the variables \
+Which fit was better based on $R^2$ this ties to model selection(which variable to choose) \
+Assumptions about regression model are satisfied or not? \
+Normality of the residuals, outliers effect on the slope and intercept \
+
+
