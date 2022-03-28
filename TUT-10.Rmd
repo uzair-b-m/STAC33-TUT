@@ -9,7 +9,7 @@ library(tidyverse)
 ```
 
 # Introduction
-This week's lecture we will be discussing topics from Ch:19 and Ch.20. Chapter 19 is about **Multiple Regression** and Chapter 20 is about **Regression with Catagorical Variable**. All the problems being discussed can be found on the PASIAS [here](https://ritsokiguess.site/pasias/)
+This week's lecture we will be discussing topics from Ch:19 and Ch.20. Chapter 19 is about **Multiple Regression** and Chapter 20 is about **Regression with Categorical Variable**. All the problems being discussed can be found on the PASIAS [here](https://ritsokiguess.site/pasias/)
 
 ## 19.8 Salaries of mathematicians
 A researcher in a scientific foundation wanted to evaluate the relationship between annual salaries of mathematicians and three explanatory variables: \
@@ -132,6 +132,7 @@ Sex is a categorical variable, so it has a baseline category, which is the first
 
 ## Questions you can expect
 Model Assumptions \
+Interpretation of the model parameters $\hat{\beta_{i}}$ \ 
 Transformations \
 How do we make the decision of coming up with Transformations \
 Effect of transformations on the model and ***residuals*** \
